@@ -9,7 +9,7 @@
 - [x] Architecture diagram: [docs/ARCHITECTURE_DIAGRAM.md](ARCHITECTURE_DIAGRAM.md)
 - [x] Text project description included below.
 - [x] Submission category included below.
-- [ ] Confirm GitHub detects the MIT license in the repository About section.
+- [x] GitHub detects the MIT license in the repository About section.
 - [ ] Add public Alibaba Cloud backend proof video URL.
 - [ ] Add public 3-minute demo video URL.
 - [ ] Optional: add blog or social post URL about building with QwenCloud.
@@ -105,7 +105,7 @@ npm run typecheck
 npm run build
 ```
 
-Current local verification:
+Current local verification on 2026-06-08:
 
 - 24 tests passing across 9 test files.
 - 90.35% statement coverage and 91.48% line coverage.

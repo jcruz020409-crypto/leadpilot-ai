@@ -192,7 +192,7 @@ npm run typecheck
 npm run build
 ```
 
-Current local verification on 2026-06-03:
+Current local verification on 2026-06-08:
 
 - Unit/integration tests: 24 passing across 9 test files.
 - Coverage: 90.35% statement coverage and 91.48% line coverage.
