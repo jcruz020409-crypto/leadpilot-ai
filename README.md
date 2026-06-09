@@ -78,8 +78,6 @@ report.
 
 ![LeadPilot AI Architecture](docs/assets/leadpilot-architecture.png)
 
-More detail: [ARCHITECTURE.md](ARCHITECTURE.md)
-
 Standalone diagram: [docs/ARCHITECTURE_DIAGRAM.md](docs/ARCHITECTURE_DIAGRAM.md)
 
 ## Alibaba Cloud / Qwen Evidence
@@ -188,9 +186,9 @@ npm run typecheck
 npm run build
 ```
 
-Current local verification on 2026-06-08:
+Current local verification on 2026-06-09:
 
-- Unit/integration tests: 24 passing across 9 test files.
+- Unit/integration tests: 25 passing across 9 test files.
 - Coverage: 90.35% statement coverage and 91.48% line coverage.
 - TypeScript: passing.
 - Production build: passing.
@@ -214,14 +212,9 @@ Suggested 3-minute structure:
 
 ## Documentation
 
-- [PROJECT_FINAL.md](PROJECT_FINAL.md)
-- [DEMO_1.md](DEMO_1.md)
-- [ARCHITECTURE.md](ARCHITECTURE.md)
-- [AI_AGENTS.md](AI_AGENTS.md)
-- [TECH_STACK.md](TECH_STACK.md)
 - [REQUIREMENTS.md](REQUIREMENTS.md)
-- [ACCEPTANCE_CRITERIA.md](ACCEPTANCE_CRITERIA.md)
 - [docs/SUBMISSION.md](docs/SUBMISSION.md)
 - [docs/ALIBABA_CLOUD_PROOF.md](docs/ALIBABA_CLOUD_PROOF.md)
 - [docs/ARCHITECTURE_DIAGRAM.md](docs/ARCHITECTURE_DIAGRAM.md)
-- [docs/HACKATHON_WINNING_PLAN.md](docs/HACKATHON_WINNING_PLAN.md)
+- [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)
+- [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)

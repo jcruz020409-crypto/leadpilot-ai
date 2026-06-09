@@ -4,6 +4,7 @@
 
 - [x] Public repository URL: `https://github.com/jcruz020409-crypto/leadpilot-ai`
 - [x] Open-source license file: [LICENSE](../LICENSE)
+- [x] Requirements: [REQUIREMENTS.md](../REQUIREMENTS.md)
 - [x] Code evidence for Alibaba Cloud backend deployment:
   [deploy/alibaba-cloud/Dockerfile](../deploy/alibaba-cloud/Dockerfile)
 - [x] Code evidence for Alibaba Cloud / Qwen Cloud API usage:
@@ -56,7 +57,6 @@ MIT License: [LICENSE](../LICENSE)
 See:
 
 - [README.md#architecture](../README.md#architecture)
-- [ARCHITECTURE.md](../ARCHITECTURE.md)
 - [docs/ARCHITECTURE_DIAGRAM.md](ARCHITECTURE_DIAGRAM.md)
 
 ## Alibaba Cloud / Qwen Cloud Evidence
@@ -111,9 +111,9 @@ npm run typecheck
 npm run build
 ```
 
-Current local verification on 2026-06-08:
+Current local verification on 2026-06-09:
 
-- 24 tests passing across 9 test files.
+- 25 tests passing across 9 test files.
 - 90.35% statement coverage and 91.48% line coverage.
 - TypeScript check passing.
 - Next.js build passing.

@@ -1,4 +1,0 @@
-# CODEX RULES
-
-Status: draft
-

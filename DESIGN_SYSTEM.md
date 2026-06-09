@@ -1,4 +1,0 @@
-# DESIGN SYSTEM
-
-Status: draft
-

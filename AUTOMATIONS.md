@@ -1,4 +1,0 @@
-# AUTOMATIONS
-
-Status: draft
-

@@ -1,4 +1,0 @@
-# CONTRIBUTING
-
-Status: draft
-
