@@ -108,8 +108,13 @@ Standalone diagram: [docs/ARCHITECTURE_DIAGRAM.md](docs/ARCHITECTURE_DIAGRAM.md)
 
 ## Alibaba Cloud / Qwen Evidence
 
-The backend integration with Alibaba Cloud Model Studio / Qwen Cloud is in:
+The backend deployment proof and Alibaba Cloud Model Studio / Qwen Cloud
+integration are in:
 
+- [deploy/alibaba-cloud/Dockerfile](deploy/alibaba-cloud/Dockerfile)
+- [deploy/alibaba-cloud/docker-compose.ecs.yml](deploy/alibaba-cloud/docker-compose.ecs.yml)
+- [deploy/alibaba-cloud/ack-deployment.yaml](deploy/alibaba-cloud/ack-deployment.yaml)
+- [apps/web/src/app/api/deployment-proof/route.ts](apps/web/src/app/api/deployment-proof/route.ts)
 - [apps/web/src/lib/qwen-provider.ts](apps/web/src/lib/qwen-provider.ts)
 - [apps/web/src/lib/env-loader.ts](apps/web/src/lib/env-loader.ts)
 - [apps/web/src/app/api/analyze/route.ts](apps/web/src/app/api/analyze/route.ts)
@@ -121,6 +126,20 @@ The backend integration with Alibaba Cloud Model Studio / Qwen Cloud is in:
 ```text
 POST ${QWEN_BASE_URL}/chat/completions
 Authorization: Bearer ${DASHSCOPE_API_KEY}
+```
+
+The Alibaba Cloud deployment proof endpoint is:
+
+```text
+GET /api/deployment-proof
+```
+
+When deployed on Alibaba Cloud, configure:
+
+```env
+DEPLOYMENT_PROVIDER=Alibaba Cloud
+ALIBABA_CLOUD_RUNTIME=ECS Docker
+ALIBABA_CLOUD_REGION=your-region
 ```
 
 The provider uses structured output with:

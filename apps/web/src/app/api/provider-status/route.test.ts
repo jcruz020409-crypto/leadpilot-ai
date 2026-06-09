@@ -9,8 +9,8 @@ describe("GET /api/provider-status", () => {
     const previousExaKey = process.env.EXA_API_KEY;
     process.env.DASHSCOPE_API_KEY = "test-secret-key";
     process.env.LEADPILOT_FORCE_MOCK = "false";
-    delete process.env.DATABASE_URL;
-    delete process.env.EXA_API_KEY;
+    process.env.DATABASE_URL = "";
+    process.env.EXA_API_KEY = "";
 
     const response = await GET();
     const data = await response.json();

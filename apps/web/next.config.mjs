@@ -5,6 +5,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
+  experimental: {
+    devtoolSegmentExplorer: false
+  },
   outputFileTracingRoot: path.resolve(__dirname, "../.."),
   poweredByHeader: false
 };

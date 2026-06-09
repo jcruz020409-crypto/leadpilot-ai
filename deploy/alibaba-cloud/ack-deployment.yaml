@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leadpilot-ai
+  labels:
+    app: leadpilot-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: leadpilot-ai
+  template:
+    metadata:
+      labels:
+        app: leadpilot-ai
+    spec:
+      containers:
+        - name: leadpilot-ai
+          image: registry-intl.${ALIBABA_CLOUD_REGION}.aliyuncs.com/${ALIBABA_NAMESPACE}/leadpilot-ai:${IMAGE_TAG}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3000"
+            - name: HOSTNAME
+              value: 0.0.0.0
+            - name: DEPLOYMENT_PROVIDER
+              value: Alibaba Cloud
+            - name: ALIBABA_CLOUD_RUNTIME
+              value: ACK Kubernetes
+            - name: ALIBABA_CLOUD_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: leadpilot-ai-config
+                  key: ALIBABA_CLOUD_REGION
+            - name: QWEN_BASE_URL
+              value: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+            - name: QWEN_TEXT_MODEL
+              value: qwen-plus
+            - name: QWEN_REASONING_MODEL
+              value: qwen-plus
+            - name: QWEN_TIMEOUT_MS
+              value: "60000"
+            - name: LEADPILOT_FORCE_MOCK
+              value: "false"
+            - name: LEADPILOT_MOCK_WEBSITE
+              value: "false"
+            - name: DASHSCOPE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: leadpilot-ai-secrets
+                  key: DASHSCOPE_API_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: leadpilot-ai-secrets
+                  key: DATABASE_URL
+                  optional: true
+            - name: DATABASE_SSL
+              value: "true"
+          readinessProbe:
+            httpGet:
+              path: /api/deployment-proof
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/provider-status
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: leadpilot-ai
+spec:
+  type: LoadBalancer
+  selector:
+    app: leadpilot-ai
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

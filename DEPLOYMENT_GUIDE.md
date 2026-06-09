@@ -48,8 +48,12 @@ Use the `Session Pooler` connection string from the Supabase dashboard
 ## Alibaba Cloud Proof Requirement
 
 The submission requires proof that the backend runs on Alibaba Cloud. The repo
-contains the code-level proof of Alibaba Cloud / Qwen API usage in:
+contains the code-level proof of Alibaba Cloud backend deployment in:
 
+- [deploy/alibaba-cloud/Dockerfile](deploy/alibaba-cloud/Dockerfile)
+- [deploy/alibaba-cloud/docker-compose.ecs.yml](deploy/alibaba-cloud/docker-compose.ecs.yml)
+- [deploy/alibaba-cloud/ack-deployment.yaml](deploy/alibaba-cloud/ack-deployment.yaml)
+- [apps/web/src/app/api/deployment-proof/route.ts](apps/web/src/app/api/deployment-proof/route.ts)
 - [apps/web/src/lib/qwen-provider.ts](apps/web/src/lib/qwen-provider.ts)
 - [apps/web/src/app/api/analyze/route.ts](apps/web/src/app/api/analyze/route.ts)
 - [docs/ALIBABA_CLOUD_PROOF.md](docs/ALIBABA_CLOUD_PROOF.md)

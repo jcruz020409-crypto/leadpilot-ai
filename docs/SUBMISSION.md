@@ -4,7 +4,9 @@
 
 - [x] Public repository URL: `https://github.com/jcruz020409-crypto/leadpilot-ai`
 - [x] Open-source license file: [LICENSE](../LICENSE)
-- [x] Code evidence for Alibaba Cloud / Qwen Cloud:
+- [x] Code evidence for Alibaba Cloud backend deployment:
+  [deploy/alibaba-cloud/Dockerfile](../deploy/alibaba-cloud/Dockerfile)
+- [x] Code evidence for Alibaba Cloud / Qwen Cloud API usage:
   [apps/web/src/lib/qwen-provider.ts](../apps/web/src/lib/qwen-provider.ts)
 - [x] Architecture diagram: [docs/ARCHITECTURE_DIAGRAM.md](ARCHITECTURE_DIAGRAM.md)
 - [x] Text project description included below.
@@ -61,6 +63,10 @@ See:
 
 Code-level evidence:
 
+- [deploy/alibaba-cloud/Dockerfile](../deploy/alibaba-cloud/Dockerfile)
+- [deploy/alibaba-cloud/docker-compose.ecs.yml](../deploy/alibaba-cloud/docker-compose.ecs.yml)
+- [deploy/alibaba-cloud/ack-deployment.yaml](../deploy/alibaba-cloud/ack-deployment.yaml)
+- [apps/web/src/app/api/deployment-proof/route.ts](../apps/web/src/app/api/deployment-proof/route.ts)
 - [apps/web/src/lib/qwen-provider.ts](../apps/web/src/lib/qwen-provider.ts)
 - [apps/web/src/app/api/analyze/route.ts](../apps/web/src/app/api/analyze/route.ts)
 - [docs/ALIBABA_CLOUD_PROOF.md](ALIBABA_CLOUD_PROOF.md)
