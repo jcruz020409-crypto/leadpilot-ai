@@ -77,3 +77,8 @@ Minimum runtime requirements:
 - Node.js 22 or compatible runtime.
 - Environment variables from `.env.example`.
 - Public HTTPS endpoint for the Next.js backend.
+
+For the ECS console settings, use the checklist in
+[deploy/alibaba-cloud/README.md](deploy/alibaba-cloud/README.md). In particular,
+restrict SSH to a trusted IP, keep RDP closed for Linux instances, and make sure
+the public URL routes traffic from HTTP/HTTPS to the Next.js app on port `3000`.

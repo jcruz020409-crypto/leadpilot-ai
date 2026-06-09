@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">LeadPilot AI architecture diagram</title>
+  <desc id="desc">Container-level architecture showing the Next.js frontend, Alibaba Cloud backend, multi-agent pipeline, Qwen Cloud provider adapter, data stores, and external services.</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#ca8a04"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Arial, sans-serif; fill: #475569; }
+      .lane-title { font: 700 16px Arial, sans-serif; fill: #334155; letter-spacing: .4px; text-transform: uppercase; }
+      .box-title { font: 700 17px Arial, sans-serif; fill: #172033; }
+      .box-text { font: 400 13px Arial, sans-serif; fill: #475569; }
+      .edge-label { font: 700 12px Arial, sans-serif; fill: #334155; }
+      .small { font: 400 12px Arial, sans-serif; fill: #64748b; }
+      .lane { fill: #ffffff; stroke: #d8e1ea; stroke-width: 2; rx: 20; filter: url(#shadow); }
+      .ux { fill: #eef2ff; stroke: #4f46e5; stroke-width: 2; rx: 14; }
+      .backend { fill: #ecfeff; stroke: #0891b2; stroke-width: 2; rx: 14; }
+      .agent { fill: #f0fdf4; stroke: #16a34a; stroke-width: 2; rx: 14; }
+      .external { fill: #f8fafc; stroke: #64748b; stroke-width: 2; rx: 14; }
+      .data { fill: #fefce8; stroke: #ca8a04; stroke-width: 2; rx: 14; }
+      .security { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; rx: 14; }
+      .arrow-blue { fill: none; stroke: #2563eb; stroke-width: 3; marker-end: url(#arrow-blue); }
+      .arrow-green { fill: none; stroke: #16a34a; stroke-width: 3; marker-end: url(#arrow-green); }
+      .arrow-amber { fill: none; stroke: #ca8a04; stroke-width: 3; marker-end: url(#arrow-amber); }
+      .arrow-muted { fill: none; stroke: #94a3b8; stroke-width: 2.5; stroke-dasharray: 8 7; marker-end: url(#arrow-blue); }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="1000"/>
+  <text class="title" x="64" y="64">LeadPilot AI Architecture</text>
+  <text class="subtitle" x="64" y="94">Qwen Cloud is reached only through the backend provider adapter; generated results flow back to the frontend and memory store.</text>
+
+  <rect class="lane" x="50" y="140" width="315" height="720"/>
+  <text class="lane-title" x="82" y="178">User Experience</text>
+
+  <rect class="lane" x="405" y="140" width="610" height="720"/>
+  <text class="lane-title" x="437" y="178">Alibaba Cloud Runtime / Next.js Backend</text>
+  <text class="small" x="437" y="203">Running on Alibaba Cloud ECS</text>
+
+  <rect class="lane" x="1055" y="140" width="495" height="720"/>
+  <text class="lane-title" x="1087" y="178">Cloud AI, Data, and External Services</text>
+
+  <!-- User experience -->
+  <rect class="ux" x="88" y="220" width="240" height="88"/>
+  <text class="box-title" x="208" y="250" text-anchor="middle">Sales Operator</text>
+  <text class="box-text" x="208" y="275" text-anchor="middle">Company URL</text>
+  <text class="box-text" x="208" y="294" text-anchor="middle">+ optional social URLs</text>
+
+  <rect class="ux" x="88" y="365" width="240" height="126"/>
+  <text class="box-title" x="208" y="398" text-anchor="middle">Next.js Frontend</text>
+  <text class="box-text" x="208" y="423" text-anchor="middle">URL intake</text>
+  <text class="box-text" x="208" y="442" text-anchor="middle">Live agent progress</text>
+  <text class="box-text" x="208" y="461" text-anchor="middle">Report review and approval</text>
+
+  <rect class="ux" x="88" y="555" width="240" height="112"/>
+  <text class="box-title" x="208" y="588" text-anchor="middle">History + Exports</text>
+  <text class="box-text" x="208" y="613" text-anchor="middle">Saved analyses</text>
+  <text class="box-text" x="208" y="632" text-anchor="middle">Full report details</text>
+  <text class="box-text" x="208" y="651" text-anchor="middle">Copy and PDF actions</text>
+
+  <!-- Backend internals -->
+  <rect class="backend" x="455" y="215" width="245" height="116"/>
+  <text class="box-title" x="578" y="248" text-anchor="middle">Backend API Routes</text>
+  <text class="box-text" x="578" y="273" text-anchor="middle">/api/analyze/jobs</text>
+  <text class="box-text" x="578" y="292" text-anchor="middle">/api/history, /api/ask-report</text>
+  <text class="box-text" x="578" y="311" text-anchor="middle">/api/provider-status</text>
+
+  <rect class="backend" x="745" y="215" width="220" height="116"/>
+  <text class="box-title" x="855" y="248" text-anchor="middle">Analysis Job Store</text>
+  <text class="box-text" x="855" y="273" text-anchor="middle">Job ID + status</text>
+  <text class="box-text" x="855" y="292" text-anchor="middle">Running/completed/failed</text>
+  <text class="box-text" x="855" y="311" text-anchor="middle">Per-agent progress</text>
+
+  <rect class="security" x="455" y="385" width="245" height="116"/>
+  <text class="box-title" x="578" y="418" text-anchor="middle">URL Safety Guard</text>
+  <text class="box-text" x="578" y="443" text-anchor="middle">SSRF protection</text>
+  <text class="box-text" x="578" y="462" text-anchor="middle">Private IP and scheme checks</text>
+  <text class="box-text" x="578" y="481" text-anchor="middle">Redirect and timeout limits</text>
+
+  <rect class="backend" x="745" y="385" width="220" height="116"/>
+  <text class="box-title" x="855" y="418" text-anchor="middle">Website Fetcher</text>
+  <text class="box-text" x="855" y="443" text-anchor="middle">Public page retrieval</text>
+  <text class="box-text" x="855" y="462" text-anchor="middle">Text extraction</text>
+  <text class="box-text" x="855" y="481" text-anchor="middle">Website snapshots</text>
+
+  <rect class="agent" x="455" y="555" width="510" height="132"/>
+  <text class="box-title" x="710" y="587" text-anchor="middle">Multi-Agent Analysis Pipeline</text>
+  <text class="box-text" x="710" y="613" text-anchor="middle">Manager -> Research -> Opportunity -> Competitor</text>
+  <text class="box-text" x="710" y="632" text-anchor="middle">Pricing -> Proposal -> Final Report -> Memory Agent</text>
+  <text class="box-text" x="710" y="651" text-anchor="middle">Produces summary, problems, heatmap, score, ROI, budget, proposal, trace</text>
+
+  <rect class="backend" x="455" y="735" width="245" height="86"/>
+  <text class="box-title" x="578" y="768" text-anchor="middle">QwenCloudProvider</text>
+  <text class="box-text" x="578" y="793" text-anchor="middle">DashScope API compatible</text>
+  <text class="box-text" x="578" y="812" text-anchor="middle">JSON Schema structured output</text>
+
+  <rect class="backend" x="745" y="735" width="220" height="86"/>
+  <text class="box-title" x="855" y="768" text-anchor="middle">Memory Store Adapter</text>
+  <text class="box-text" x="855" y="793" text-anchor="middle">Postgres when configured</text>
+  <text class="box-text" x="855" y="812" text-anchor="middle">Local JSONL fallback</text>
+
+  <!-- External systems -->
+  <rect class="external" x="1108" y="220" width="380" height="102"/>
+  <text class="box-title" x="1298" y="253" text-anchor="middle">Public Websites + Social Profiles</text>
+  <text class="box-text" x="1298" y="278" text-anchor="middle">Prospect website, LinkedIn, X/Twitter</text>
+  <text class="box-text" x="1298" y="297" text-anchor="middle">Fetched only after URL safety checks</text>
+
+  <rect class="external" x="1108" y="370" width="380" height="150"/>
+  <text class="box-title" x="1298" y="404" text-anchor="middle">Qwen Cloud</text>
+  <text class="box-text" x="1298" y="429" text-anchor="middle">Alibaba Cloud Model Studio</text>
+  <text class="box-text" x="1298" y="448" text-anchor="middle">DashScope API</text>
+  <text class="box-text" x="1298" y="467" text-anchor="middle">POST /chat/completions</text>
+  <text class="box-text" x="1298" y="486" text-anchor="middle">qwen-plus by default, env-configured</text>
+  <text class="small" x="1298" y="505" text-anchor="middle">Secret: DASHSCOPE_API_KEY in environment only</text>
+
+  <rect class="external" x="1108" y="545" width="380" height="92"/>
+  <text class="box-title" x="1298" y="578" text-anchor="middle">Exa Search API</text>
+  <text class="box-text" x="1298" y="603" text-anchor="middle">Optional competitor grounding</text>
+  <text class="box-text" x="1298" y="622" text-anchor="middle">Enabled with EXA_API_KEY</text>
+
+  <rect class="data" x="1108" y="685" width="380" height="96"/>
+  <text class="box-title" x="1298" y="719" text-anchor="middle">Supabase Postgres</text>
+  <text class="box-text" x="1298" y="744" text-anchor="middle">leadpilot_analysis_memory</text>
+  <text class="box-text" x="1298" y="763" text-anchor="middle">Saved companies, scores, full report JSON</text>
+
+  <rect class="data" x="1108" y="810" width="380" height="60"/>
+  <text class="box-title" x="1298" y="846" text-anchor="middle">Local JSONL Demo Fallback</text>
+
+  <!-- Primary arrows -->
+  <path class="arrow-blue" d="M208 308 L208 365"/>
+  <path class="arrow-blue" d="M328 428 C370 428, 402 272, 455 272"/>
+  <text class="edge-label" x="367" y="346" text-anchor="middle">create/poll analysis</text>
+
+  <path class="arrow-blue" d="M700 272 L745 272"/>
+  <text class="edge-label" x="722" y="255" text-anchor="middle">track</text>
+
+  <path class="arrow-blue" d="M578 331 L578 385"/>
+  <path class="arrow-blue" d="M700 443 L745 443"/>
+  <path class="arrow-blue" d="M855 501 C855 528, 810 545, 770 555"/>
+  <text class="edge-label" x="817" y="531" text-anchor="middle">snapshot</text>
+
+  <path class="arrow-blue" d="M965 443 C1018 443, 1048 270, 1108 270"/>
+  <text class="edge-label" x="1038" y="322" text-anchor="middle">safe fetch</text>
+
+  <path class="arrow-green" d="M578 687 L578 735"/>
+  <text class="edge-label" x="519" y="718" text-anchor="middle">structured prompts</text>
+
+  <path class="arrow-green" d="M700 778 C860 778, 1010 434, 1108 434"/>
+  <text class="edge-label" x="919" y="575" text-anchor="middle">JSON Schema completions</text>
+
+  <path class="arrow-muted" d="M760 620 C970 620, 1018 591, 1108 591"/>
+  <text class="edge-label" x="954" y="611" text-anchor="middle">optional competitor search</text>
+
+  <path class="arrow-amber" d="M855 687 L855 735"/>
+  <path class="arrow-amber" d="M965 778 C1030 778, 1054 733, 1108 733"/>
+  <text class="edge-label" x="1034" y="754" text-anchor="middle">DATABASE_URL</text>
+
+  <path class="arrow-muted" d="M965 806 C1030 806, 1052 840, 1108 840"/>
+  <text class="edge-label" x="1035" y="826" text-anchor="middle">fallback</text>
+
+  <path class="arrow-blue" d="M455 625 C375 625, 365 430, 328 430"/>
+  <text class="edge-label" x="371" y="579" text-anchor="middle">progress + final report</text>
+
+  <path class="arrow-blue" d="M855 821 C855 900, 250 900, 208 667"/>
+  <text class="edge-label" x="520" y="883" text-anchor="middle">recent analyses</text>
+
+  <path class="arrow-blue" d="M208 491 L208 555"/>
+
+  <text class="small" x="64" y="940">Boundary note: the browser and database do not call Qwen Cloud directly. The backend provider adapter mediates AI requests, redacts secrets, records trace metadata, and returns validated results.</text>
+  <text class="small" x="64" y="964">Source files: apps/web/src/lib/qwen-provider.ts, apps/web/src/lib/analysis-pipeline.ts, apps/web/src/lib/memory-store.ts, apps/web/src/app/api/analyze/jobs/route.ts.</text>
+</svg>

@@ -31,6 +31,39 @@ DATABASE_URL=postgresql://...
 DATABASE_SSL=true
 ```
 
+## ECS Console Checklist
+
+Use this when creating the Alibaba Cloud ECS instance from the console.
+
+- Billing method: pay-as-you-go is acceptable for the proof deployment.
+- Region: choose the region you will record in the proof video. If you select
+  Singapore in the console, set `ALIBABA_CLOUD_REGION=ap-southeast-1`.
+- Network: create or select a VPC and vSwitch in the same region and zone as
+  the instance.
+- Instance type: `ecs.e-c1m1.large` with 2 vCPU and 2 GiB memory is enough for
+  a small proof run if the Docker image is built elsewhere and only pulled on
+  the instance. Use at least 4 GiB memory if you plan to build the Next.js app
+  directly on the ECS instance.
+- Image: use a Linux image such as Ubuntu LTS or Alibaba Cloud Linux. The
+  Dockerfile already provides the Node.js 22 runtime inside the container.
+- System disk: 40 GiB is sufficient for a demo container host. Enable snapshots
+  if the instance will be kept after the proof video.
+- Public IP: assign a public IPv4 address or use an EIP so the proof endpoints
+  can be reached from the browser.
+- Bandwidth: 5 Mbps is enough for a short demo and API proof flow.
+- Security group: allow HTTP `80` and HTTPS `443` from the internet. Restrict
+  SSH `22` to your own trusted IP address, and keep RDP `3389` closed for Linux
+  instances. ICMP is optional.
+- Logon credential: prefer a key pair and `ecs-user`. Avoid password login and
+  avoid using `root` for routine access.
+- Backups: automatic file backup is optional for a short proof deployment. If
+  you leave it enabled, verify the billing terms first.
+
+The default Compose file exposes the app on port `3000`. For a public proof URL,
+either temporarily allow TCP `3000` from your IP while testing, or place Nginx,
+Caddy, or an Alibaba Cloud load balancer in front of the app on ports `80` and
+`443`.
+
 ## ECS Deployment Path
 
 1. Build the image:

@@ -160,6 +160,17 @@ a:hover {
   min-width: 0;
 }
 
+.brand-home-link {
+  border-radius: 8px;
+  color: inherit;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.brand-home-link:hover {
+  text-decoration: none;
+}
+
 .brand-mark {
   display: block;
   flex: 0 0 auto;

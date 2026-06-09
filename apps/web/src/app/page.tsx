@@ -247,7 +247,9 @@ export default function HomePage() {
       <section className="workspace w-full">
         <header className="topbar">
           <div className="brand-lockup">
-            <img className="brand-mark" src={LEADPILOT_MARK_PATH} alt="" width={72} height={72} aria-hidden="true" />
+            <Link className="brand-home-link" href="/" aria-label="Go to LeadPilot AI home">
+              <img className="brand-mark" src={LEADPILOT_MARK_PATH} alt="" width={72} height={72} aria-hidden="true" />
+            </Link>
             <div>
               <p className="eyebrow">Agent Society / Autopilot Agent</p>
               <h1>LeadPilot AI</h1>

@@ -102,7 +102,9 @@ export default function HistoryPage() {
       <section className="workspace">
         <header className="topbar">
           <div className="brand-lockup">
-            <img className="brand-mark" src={LEADPILOT_MARK_PATH} alt="" width={72} height={72} aria-hidden="true" />
+            <Link className="brand-home-link" href="/" aria-label="Go to LeadPilot AI home">
+              <img className="brand-mark" src={LEADPILOT_MARK_PATH} alt="" width={72} height={72} aria-hidden="true" />
+            </Link>
             <div>
               <p className="eyebrow">LeadPilot AI Memory</p>
               <h1>Analysis History</h1>

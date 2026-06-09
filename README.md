@@ -76,31 +76,7 @@ report.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  User["User"] --> Web["Next.js Frontend: website + social URLs"]
-  Web --> API["/api/analyze Backend"]
-  Web --> Jobs["/api/analyze/jobs Progress API"]
-  API --> Guard["URL Safety Guard"]
-  Guard --> Fetcher["Website + Social Fetcher"]
-  Fetcher --> Manager["Manager Agent"]
-  Manager --> Research["Research Agent"]
-  Research --> Opportunity["Opportunity Agent"]
-  Opportunity --> Competitor["Competitor Agent"]
-  Competitor --> Pricing["Pricing Agent"]
-  Pricing --> Proposal["Proposal Agent"]
-  Proposal --> Report["Final Report Assembly"]
-  Report --> Memory["Memory Agent"]
-  Memory --> Store[("Postgres Memory / JSONL fallback")]
-  Research --> Qwen["Qwen Cloud / DashScope API"]
-  Opportunity --> Qwen
-  Competitor --> Qwen
-  Competitor --> Exa["Exa Search API (optional)"]
-  Pricing --> Qwen
-  Proposal --> Qwen
-  API --> History["Postgres Memory / JSONL fallback"]
-  Jobs --> Manager
-```
+![LeadPilot AI Architecture](docs/assets/leadpilot-architecture.png)
 
 More detail: [ARCHITECTURE.md](ARCHITECTURE.md)
 
