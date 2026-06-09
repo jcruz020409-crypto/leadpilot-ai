@@ -155,7 +155,7 @@ export class PostgresMemoryStore implements MemoryStore {
   private async ensureSchema() {
     if (this.ready) return;
     await this.pool.query(`
-      create table if not exists leadpilot_analysis_memory (
+      create table if not exists public.leadpilot_analysis_memory (
         id text primary key,
         saved_at timestamptz not null,
         source_url text not null,
@@ -165,13 +165,23 @@ export class PostgresMemoryStore implements MemoryStore {
         proposal_title text not null,
         proposal_summary text not null,
         recommended_angle text not null,
-        next_steps jsonb not null,
+        next_steps jsonb not null default '[]'::jsonb,
         result_json jsonb not null
       );
       create index if not exists leadpilot_analysis_memory_saved_at_idx
-        on leadpilot_analysis_memory (saved_at desc);
+        on public.leadpilot_analysis_memory (saved_at desc);
       create index if not exists leadpilot_analysis_memory_company_idx
-        on leadpilot_analysis_memory (lower(company_name));
+        on public.leadpilot_analysis_memory (lower(company_name));
+      alter table public.leadpilot_analysis_memory enable row level security;
+      do $$
+      begin
+        if exists (select 1 from pg_roles where rolname = 'anon') then
+          revoke all on table public.leadpilot_analysis_memory from anon;
+        end if;
+        if exists (select 1 from pg_roles where rolname = 'authenticated') then
+          revoke all on table public.leadpilot_analysis_memory from authenticated;
+        end if;
+      end $$;
     `);
     this.ready = true;
   }

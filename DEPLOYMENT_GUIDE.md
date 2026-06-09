@@ -31,6 +31,20 @@ LEADPILOT_MOCK_WEBSITE=false
 
 Never commit `.env.local`.
 
+## Supabase Configuration
+
+LeadPilot stores Memory Agent history in Supabase Postgres when `DATABASE_URL`
+is configured. Create the Supabase project, apply the migration in
+`supabase/migrations/`, then set:
+
+```env
+DATABASE_URL=postgresql://postgres.your-project-ref:your-password@aws-0-your-region.pooler.supabase.com:5432/postgres
+DATABASE_SSL=true
+```
+
+Use the `Session Pooler` connection string from the Supabase dashboard
+`Connect` panel. Full setup notes are in [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md).
+
 ## Alibaba Cloud Proof Requirement
 
 The submission requires proof that the backend runs on Alibaba Cloud. The repo
@@ -59,4 +73,3 @@ Minimum runtime requirements:
 - Node.js 22 or compatible runtime.
 - Environment variables from `.env.example`.
 - Public HTTPS endpoint for the Next.js backend.
-

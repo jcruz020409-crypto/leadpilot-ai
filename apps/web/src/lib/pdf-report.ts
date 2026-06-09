@@ -1,10 +1,14 @@
 import { jsPDF } from "jspdf";
+import { LEADPILOT_LOGO_PATH } from "./brand";
 import type { LeadPilotAnalysisResult } from "./types";
 
 export type ReportApprovalStatus = "pending" | "approved" | "revision_requested";
 
 type PdfDoc = InstanceType<typeof jsPDF>;
 type RGB = [number, number, number];
+type LeadPilotPdfOptions = {
+  brandLogoDataUrl?: string;
+};
 
 const palette = {
   navy: [7, 17, 31] as RGB,
@@ -24,13 +28,16 @@ const page = {
   width: 595.28,
   height: 841.89
 };
+const brandLogoAspectRatio = 960 / 364;
 
-export function downloadLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatus: ReportApprovalStatus) {
-  const doc = buildLeadPilotPdf(result, approvalStatus);
+export async function downloadLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatus: ReportApprovalStatus) {
+  const doc = buildLeadPilotPdf(result, approvalStatus, {
+    brandLogoDataUrl: await loadBrandLogoDataUrl()
+  });
   doc.save(`${fileBaseName(result.businessSummary.companyName)}-leadpilot-strategy-report.pdf`);
 }
 
-export function buildLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatus: ReportApprovalStatus) {
+export function buildLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatus: ReportApprovalStatus, options: LeadPilotPdfOptions = {}) {
   const doc = new jsPDF({ format: "a4", unit: "pt" });
   const width = doc.internal.pageSize.getWidth();
   const height = doc.internal.pageSize.getHeight();
@@ -48,7 +55,7 @@ export function buildLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatu
     if (y + needed > height - margin - 34) {
       doc.addPage();
       y = margin + 28;
-      drawPageChrome(doc, doc.getNumberOfPages(), result.businessSummary.companyName);
+      drawPageChrome(doc, doc.getNumberOfPages(), result.businessSummary.companyName, options.brandLogoDataUrl);
     }
   };
 
@@ -127,10 +134,10 @@ export function buildLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatu
     creator: "LeadPilot AI powered by Qwen Cloud"
   });
 
-  drawCover(doc, result, approvalStatus);
+  drawCover(doc, result, approvalStatus, options.brandLogoDataUrl);
   doc.addPage();
   y = margin + 28;
-  drawPageChrome(doc, 2, result.businessSummary.companyName);
+  drawPageChrome(doc, 2, result.businessSummary.companyName, options.brandLogoDataUrl);
 
   addSectionTitle("Executive Dashboard", "Page-one board view of commercial upside, investment range, ROI, and confidence.");
   ensureSpace(190);
@@ -404,7 +411,7 @@ export function buildLeadPilotPdf(result: LeadPilotAnalysisResult, approvalStatu
   }
 }
 
-function drawCover(doc: PdfDoc, result: LeadPilotAnalysisResult, approvalStatus: ReportApprovalStatus) {
+function drawCover(doc: PdfDoc, result: LeadPilotAnalysisResult, approvalStatus: ReportApprovalStatus, brandLogoDataUrl?: string) {
   const width = doc.internal.pageSize.getWidth();
   const height = doc.internal.pageSize.getHeight();
   const margin = page.margin;
@@ -419,16 +426,21 @@ function drawCover(doc: PdfDoc, result: LeadPilotAnalysisResult, approvalStatus:
   doc.setFillColor(...palette.white);
   doc.rect(0, 310, width, height - 310, "F");
 
-  drawLeadPilotLogo(doc, margin, 44, 34);
+  const brandLogoDrawn = drawBrandLogoCard(doc, brandLogoDataUrl, margin, 30, 260, 94);
+  if (!brandLogoDrawn) {
+    drawLeadPilotLogo(doc, margin, 44, 34);
+  }
   drawCompanyMark(doc, width - margin - 56, 44, 56, result.businessSummary.companyName);
 
-  doc.setTextColor(...palette.white);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(17);
-  doc.text("LeadPilot AI", margin + 44, 58);
-  doc.setFontSize(8.5);
-  doc.setFont("helvetica", "normal");
-  doc.text("Multi-Agent AI Sales Autopilot powered by Qwen Cloud", margin + 44, 75);
+  if (!brandLogoDrawn) {
+    doc.setTextColor(...palette.white);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(17);
+    doc.text("LeadPilot AI", margin + 44, 58);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "normal");
+    doc.text("Multi-Agent AI Sales Autopilot powered by Qwen Cloud", margin + 44, 75);
+  }
 
   drawPill(doc, width - margin - 184, 119, 132, 22, "Qwen Cloud live", palette.teal);
 
@@ -807,6 +819,33 @@ function drawLeadPilotLogo(doc: PdfDoc, x: number, y: number, size: number) {
   doc.setLineWidth(1);
 }
 
+function drawBrandLogoCard(doc: PdfDoc, dataUrl: string | undefined, x: number, y: number, width: number, height: number) {
+  if (!dataUrl) {
+    return false;
+  }
+
+  doc.setFillColor(...palette.white);
+  doc.roundedRect(x, y, width, height, 8, 8, "F");
+  return drawBrandLogoImage(doc, dataUrl, x + 8, y + 9, width - 16, height - 18);
+}
+
+function drawBrandLogoImage(doc: PdfDoc, dataUrl: string | undefined, x: number, y: number, width: number, height: number) {
+  if (!dataUrl) {
+    return false;
+  }
+
+  try {
+    const renderedWidth = Math.min(width, height * brandLogoAspectRatio);
+    const renderedHeight = renderedWidth / brandLogoAspectRatio;
+    const renderedX = x + (width - renderedWidth) / 2;
+    const renderedY = y + (height - renderedHeight) / 2;
+    doc.addImage(dataUrl, "PNG", renderedX, renderedY, renderedWidth, renderedHeight, "leadpilot-logo", "FAST");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function drawCompanyMark(doc: PdfDoc, x: number, y: number, size: number, companyName: string) {
   const initials = cleanText(companyName)
     .split(/\s+/)
@@ -888,16 +927,20 @@ function tint(color: RGB, amount: number): RGB {
   ];
 }
 
-function drawPageChrome(doc: PdfDoc, pageNumber: number, companyName: string) {
+function drawPageChrome(doc: PdfDoc, pageNumber: number, companyName: string, brandLogoDataUrl?: string) {
   const width = doc.internal.pageSize.getWidth();
   const margin = page.margin;
   doc.setDrawColor(...palette.line);
   doc.line(margin, 34, width - margin, 34);
-  doc.setFont("helvetica", "bold");
+  if (!drawBrandLogoImage(doc, brandLogoDataUrl, margin, 9, 70, 26)) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...palette.muted);
+    doc.text("LeadPilot AI", margin, 24);
+  }
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...palette.muted);
-  doc.text("LeadPilot AI", margin, 24);
-  doc.setFont("helvetica", "normal");
   doc.text(cleanText(oneLine(companyName, 48)), width - margin - 160, 24);
   doc.setFont("helvetica", "normal");
   doc.text(String(pageNumber), width - margin + 3, 24);
@@ -960,4 +1003,26 @@ function signedNumber(value: number) {
 
 function fileBaseName(value: string) {
   return value.replace(/[^a-z0-9]+/gi, "-").replace(/(^-|-$)/g, "").toLowerCase() || "leadpilot";
+}
+
+async function loadBrandLogoDataUrl() {
+  if (typeof window === "undefined" || typeof fetch === "undefined" || typeof FileReader === "undefined") {
+    return undefined;
+  }
+
+  try {
+    const response = await fetch(LEADPILOT_LOGO_PATH, { cache: "force-cache" });
+    if (!response.ok) {
+      return undefined;
+    }
+    const blob = await response.blob();
+    return await new Promise<string | undefined>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : undefined);
+      reader.onerror = () => resolve(undefined);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return undefined;
+  }
 }

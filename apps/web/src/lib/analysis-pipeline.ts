@@ -49,6 +49,11 @@ export async function runLeadPilotAnalysis(input: RunLeadPilotAnalysisInput): Pr
   const competitorSearch = input.competitorSearch ?? createDefaultCompetitorSearchProvider();
   const agentRuns: AgentRun[] = [];
   const socialUrls = normalizeSocialUrls(input.socialUrls);
+  const primaryUrl = input.url.trim() || socialUrls[0];
+  if (!primaryUrl) {
+    throw new Error("Add a company website URL, at least one social media URL, or both.");
+  }
+  const secondarySocialUrls = socialUrls.filter((url) => url !== primaryUrl);
 
   const plan = await runAgent(agentRuns, "Manager Agent", input.onAgentStatus, async () => ({
     stages: ["research", "opportunity", "competitor", "pricing", "proposal", "memory"],
@@ -57,8 +62,8 @@ export async function runLeadPilotAnalysis(input: RunLeadPilotAnalysisInput): Pr
   }));
 
   const research = await runAgent(agentRuns, "Research Agent", input.onAgentStatus, async () => {
-    const snapshot = await fetcher.fetch(input.url);
-    const socialSnapshots = await fetchSocialSnapshots(socialUrls, fetcher);
+    const snapshot = await fetcher.fetch(primaryUrl);
+    const socialSnapshots = await fetchSocialSnapshots(secondarySocialUrls, fetcher);
     const researchContext = buildResearchContext(snapshot, socialSnapshots);
     const summary = await buildBusinessSummary(snapshot, researchContext, qwen);
     return {
@@ -68,7 +73,7 @@ export async function runLeadPilotAnalysis(input: RunLeadPilotAnalysisInput): Pr
       businessSummary: summary.data,
       providerMetadata: summary.metadata,
       outputValidated: true,
-      agentSummary: `Summarized ${summary.data.companyName} from ${snapshot.finalUrl} and ${socialSnapshots.length} social source(s).`
+      agentSummary: `Summarized ${summary.data.companyName} from ${snapshot.finalUrl} and ${socialSnapshots.length} additional social source(s).`
     };
   });
 
@@ -172,7 +177,7 @@ export async function runLeadPilotAnalysis(input: RunLeadPilotAnalysisInput): Pr
   });
 
   const result: LeadPilotAnalysisResult = {
-    sourceUrl: input.url,
+    sourceUrl: primaryUrl,
     finalUrl: research.snapshot.finalUrl,
     socialUrls,
     businessSummary: research.businessSummary,

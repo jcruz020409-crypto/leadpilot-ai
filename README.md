@@ -170,16 +170,17 @@ LEADPILOT_MOCK_WEBSITE=false
 For cloud memory and live competitor search:
 
 ```env
-DATABASE_URL=postgres://user:password@host:5432/database
+DATABASE_URL=postgresql://postgres.your-project-ref:your-password@aws-0-your-region.pooler.supabase.com:5432/postgres
 DATABASE_SSL=true
 EXA_API_KEY=your_exa_key_here
 EXA_BASE_URL=https://api.exa.ai
 ```
 
 `DATABASE_URL` enables the Memory Agent cloud database and the Analysis History
-panel. Without it, the app falls back to local JSONL memory. `EXA_API_KEY`
-enables live competitor search before the Competitor Agent synthesizes the
-matrix.
+panel. Supabase setup details and the migration are in
+[docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Without `DATABASE_URL`, the
+app falls back to local JSONL memory. `EXA_API_KEY` enables live competitor
+search before the Competitor Agent synthesizes the matrix.
 
 Do not commit `.env.local` or API keys.
 

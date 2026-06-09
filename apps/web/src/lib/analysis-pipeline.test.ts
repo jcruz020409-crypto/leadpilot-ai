@@ -114,6 +114,22 @@ describe("runLeadPilotAnalysis", () => {
     expect(qwen.prompts[1]).toContain("X profile mentions customer support automation");
   });
 
+  it("can analyze social media profiles without a company website URL", async () => {
+    const fetcher = new RecordingWebsiteFetcher();
+    const result = await runLeadPilotAnalysis({
+      url: "",
+      socialUrls: ["https://www.linkedin.com/company/example", "https://x.com/example"],
+      fetcher,
+      qwen: new MockQwenProvider()
+    });
+
+    expect(fetcher.urls).toEqual(["https://www.linkedin.com/company/example", "https://x.com/example"]);
+    expect(result.sourceUrl).toBe("https://www.linkedin.com/company/example");
+    expect(result.socialUrls).toEqual(["https://www.linkedin.com/company/example", "https://x.com/example"]);
+    expect(result.finalReport.markdown).toContain("Business Summary");
+  });
+
+
   it("compares the current score against previous memory for the same company", async () => {
     const memory = new SeededMemoryStore();
     const result = await runLeadPilotAnalysis({

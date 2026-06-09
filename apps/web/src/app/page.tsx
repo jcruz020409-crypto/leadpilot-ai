@@ -19,50 +19,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { LEADPILOT_MARK_PATH } from "../lib/brand";
 import { downloadLeadPilotPdf } from "../lib/pdf-report";
 import type { LeadPilotAnalysisResult } from "../lib/types";
-
-type AnalyzeResponse =
-  | {
-      ok: true;
-      result: LeadPilotAnalysisResult;
-    }
-  | {
-      ok: false;
-      error: string;
-    };
-
-type HistoryRecord = {
-  id?: string;
-  companyName: string;
-  score: number;
-  sourceUrl: string;
-  finalUrl: string;
-  savedAt: string;
-  proposalTitle: string;
-  proposalSummary: string;
-};
-
-type HistoryResponse =
-  | {
-      ok: true;
-      storage: "postgres" | "jsonl";
-      records: HistoryRecord[];
-    }
-  | {
-      ok: false;
-      error: string;
-    };
-
-type HistoryDetailResponse =
-  | {
-      ok: true;
-      record: HistoryRecord & { result?: LeadPilotAnalysisResult };
-    }
-  | {
-      ok: false;
-      error: string;
-    };
 
 type ReportAnswer = {
   answer: string;
@@ -166,9 +125,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [activeAgentIndex, setActiveAgentIndex] = useState(0);
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>("pending");
-  const [history, setHistory] = useState<HistoryRecord[]>([]);
-  const [historyStorage, setHistoryStorage] = useState<"postgres" | "jsonl">("jsonl");
-  const [historyLoading, setHistoryLoading] = useState(false);
   const [currentJob, setCurrentJob] = useState<AnalysisJob | null>(null);
 
   const agentStatus = useMemo(() => {
@@ -211,10 +167,6 @@ export default function HomePage() {
     return () => window.clearInterval(interval);
   }, [loading]);
 
-  useEffect(() => {
-    void refreshHistory();
-  }, []);
-
   async function analyze(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
     setLoading(true);
@@ -226,13 +178,14 @@ export default function HomePage() {
 
     try {
       const normalizedUrl = url.trim();
-      if (!normalizedUrl) {
-        throw new Error("Paste a company website URL before running the agents.");
+      const socialUrls = parseSocialUrls(socialUrlsText);
+      if (!normalizedUrl && socialUrls.length === 0) {
+        throw new Error("Add a company website URL, at least one social media URL, or both.");
       }
       const response = await fetch("/api/analyze/jobs", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ url: normalizedUrl, socialUrls: parseSocialUrls(socialUrlsText) })
+        body: JSON.stringify({ url: normalizedUrl, socialUrls })
       });
       const payload = (await response.json()) as AnalysisJobResponse;
       if (!payload.ok) {
@@ -247,7 +200,6 @@ export default function HomePage() {
         throw new Error("Analysis job completed without a result.");
       }
       setResult(completedJob.result);
-      void refreshHistory();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Analysis failed.");
     } finally {
@@ -277,7 +229,7 @@ export default function HomePage() {
 
   function downloadReport() {
     if (!result) return;
-    downloadLeadPilotPdf(result, approvalStatus);
+    void downloadLeadPilotPdf(result, approvalStatus);
   }
 
   function addSocialPreset(presetUrl: string) {
@@ -290,45 +242,16 @@ export default function HomePage() {
     });
   }
 
-  async function refreshHistory() {
-    setHistoryLoading(true);
-    try {
-      const response = await fetch("/api/history", { cache: "no-store" });
-      const payload = (await response.json()) as HistoryResponse;
-      if (payload.ok) {
-        setHistory(payload.records);
-        setHistoryStorage(payload.storage);
-      }
-    } finally {
-      setHistoryLoading(false);
-    }
-  }
-
-  async function loadHistoryRecord(record: HistoryRecord) {
-    if (!record.id) return;
-    setError(null);
-    try {
-      const response = await fetch(`/api/history/${encodeURIComponent(record.id)}`, { cache: "no-store" });
-      const payload = (await response.json()) as HistoryDetailResponse;
-      if (!payload.ok || !payload.record.result) {
-        throw new Error(payload.ok ? "Saved analysis does not include a full report." : payload.error);
-      }
-      setResult(payload.record.result);
-      setUrl(payload.record.sourceUrl);
-      setSocialUrlsText(payload.record.result.socialUrls.join("\n"));
-      setApprovalStatus("pending");
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not load history record.");
-    }
-  }
-
   return (
     <main className="app-shell isolate antialiased">
       <section className="workspace w-full">
         <header className="topbar">
-          <div>
-            <p className="eyebrow">Agent Society / Autopilot Agent</p>
-            <h1>LeadPilot AI</h1>
+          <div className="brand-lockup">
+            <img className="brand-mark" src={LEADPILOT_MARK_PATH} alt="" width={72} height={72} aria-hidden="true" />
+            <div>
+              <p className="eyebrow">Agent Society / Autopilot Agent</p>
+              <h1>LeadPilot AI</h1>
+            </div>
           </div>
           <div className="provider-pill shadow-sm" aria-label="Qwen Cloud provider active">
             <span className="status-dot" aria-hidden="true" />
@@ -342,13 +265,13 @@ export default function HomePage() {
 
         <form className="url-console ring-1 ring-transparent" onSubmit={analyze}>
           <label htmlFor="company-url">Company Website URL</label>
+          <p className="field-help">Recommended. You can also analyze social media only when a website is not available.</p>
           <div className="url-row">
             <input
               id="company-url"
               value={url}
               onChange={(event) => setUrl(event.target.value)}
               placeholder="https://example.com"
-              required
               type="url"
             />
             <button className="primary-button" disabled={loading} type="submit">
@@ -385,14 +308,6 @@ export default function HomePage() {
           </div>
           {error ? <p className="error-line">{error}</p> : null}
         </form>
-
-        <HistoryStrip
-          loading={historyLoading}
-          onOpen={loadHistoryRecord}
-          onRefresh={refreshHistory}
-          records={history}
-          storage={historyStorage}
-        />
 
         <AgentStatusStrip statuses={agentStatus} />
 
@@ -479,51 +394,9 @@ function EmptyState() {
       <div className="status-panel">
         <Sparkles size={24} />
         <h2>Ready</h2>
-        <p>Paste a company website and generate the multi-agent sales report.</p>
-        <p className="field-help">Optional social profiles add more context for Research and Opportunity agents.</p>
+        <p>Paste a company website, social profile URLs, or both to generate the multi-agent sales report.</p>
+        <p className="field-help">Using both sources gives the Research and Opportunity agents stronger context.</p>
       </div>
-    </section>
-  );
-}
-
-function HistoryStrip({
-  loading,
-  onOpen,
-  onRefresh,
-  records,
-  storage
-}: {
-  loading: boolean;
-  onOpen: (record: HistoryRecord) => void;
-  onRefresh: () => void;
-  records: HistoryRecord[];
-  storage: "postgres" | "jsonl";
-}) {
-  return (
-    <section className="history-strip" aria-label="Analysis history">
-      <div className="history-head">
-        <div>
-          <span>Analysis History</span>
-          <strong>{storage === "postgres" ? "Cloud DB" : "Local Memory"}</strong>
-        </div>
-        <button disabled={loading} onClick={onRefresh} type="button">
-          <RefreshCw className={loading ? "spin" : ""} size={14} />
-          Refresh
-        </button>
-      </div>
-      {records.length ? (
-        <div className="history-list">
-          {records.slice(0, 5).map((record) => (
-            <button disabled={!record.id} key={`${record.companyName}-${record.savedAt}`} onClick={() => onOpen(record)} type="button">
-              <strong>{record.companyName}</strong>
-              <span>{record.score}/100</span>
-              <small>{formatDate(record.savedAt)}</small>
-            </button>
-          ))}
-        </div>
-      ) : (
-        <p>No saved analyses yet.</p>
-      )}
     </section>
   );
 }

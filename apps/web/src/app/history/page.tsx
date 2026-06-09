@@ -1,8 +1,9 @@
 "use client";
 
-import { Download, ExternalLink, RefreshCw } from "lucide-react";
+import { Copy, Download, ExternalLink, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { LEADPILOT_MARK_PATH } from "../../lib/brand";
 import { downloadLeadPilotPdf } from "../../lib/pdf-report";
 import type { LeadPilotAnalysisResult } from "../../lib/types";
 
@@ -34,6 +35,7 @@ export default function HistoryPage() {
   const [compareB, setCompareB] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedReport, setCopiedReport] = useState(false);
 
   const selectedA = useMemo(() => records.find((record) => record.id === compareA), [compareA, records]);
   const selectedB = useMemo(() => records.find((record) => record.id === compareB), [compareB, records]);
@@ -63,6 +65,7 @@ export default function HistoryPage() {
   async function openRecord(record: HistoryRecord) {
     if (!record.id) {
       setSelected(record);
+      setCopiedReport(false);
       return;
     }
     setError(null);
@@ -71,14 +74,26 @@ export default function HistoryPage() {
     if (!payload.ok) {
       setError(payload.error);
       setSelected(record);
+      setCopiedReport(false);
       return;
     }
     setSelected(payload.record);
+    setCopiedReport(false);
   }
 
   function exportSelectedPdf() {
     if (selected?.result) {
-      downloadLeadPilotPdf(selected.result, "pending");
+      void downloadLeadPilotPdf(selected.result, "pending");
+    }
+  }
+
+  async function copySelectedReport() {
+    if (!selected?.result) return;
+    try {
+      await navigator.clipboard.writeText(selected.result.finalReport.markdown);
+      setCopiedReport(true);
+    } catch {
+      setError("Could not copy the saved report.");
     }
   }
 
@@ -86,9 +101,12 @@ export default function HistoryPage() {
     <main className="app-shell history-page">
       <section className="workspace">
         <header className="topbar">
-          <div>
-            <p className="eyebrow">LeadPilot AI Memory</p>
-            <h1>Analysis History</h1>
+          <div className="brand-lockup">
+            <img className="brand-mark" src={LEADPILOT_MARK_PATH} alt="" width={72} height={72} aria-hidden="true" />
+            <div>
+              <p className="eyebrow">LeadPilot AI Memory</p>
+              <h1>Analysis History</h1>
+            </div>
           </div>
           <Link className="provider-pill" href="/">
             Back to Analyzer
@@ -135,7 +153,7 @@ export default function HistoryPage() {
                   <span>{record.score}/100</span>
                   <span>{formatDate(record.savedAt)}</span>
                   <button onClick={() => openRecord(record)} type="button">
-                    Open
+                    Open Report
                   </button>
                 </div>
               ))}
@@ -161,10 +179,16 @@ export default function HistoryPage() {
                     </a>
                   </dd>
                 </dl>
-                <button disabled={!selected.result} onClick={exportSelectedPdf} type="button">
-                  <Download size={16} />
-                  Export Previous PDF
-                </button>
+                <div className="history-action-row">
+                  <button disabled={!selected.result} onClick={copySelectedReport} type="button">
+                    <Copy size={16} />
+                    {copiedReport ? "Copied" : "Copy Report"}
+                  </button>
+                  <button disabled={!selected.result} onClick={exportSelectedPdf} type="button">
+                    <Download size={16} />
+                    Export Previous PDF
+                  </button>
+                </div>
                 {!selected.result ? <p className="field-help">Older memory records may not include the full report payload.</p> : null}
               </>
             ) : (
@@ -210,8 +234,121 @@ export default function HistoryPage() {
             <p className="field-help">Choose two saved analyses with IDs to compare score movement.</p>
           )}
         </section>
+
+        {selected?.result ? <SavedReportExplorer result={selected.result} /> : null}
       </section>
     </main>
+  );
+}
+
+function SavedReportExplorer({ result }: { result: LeadPilotAnalysisResult }) {
+  return (
+    <section className="report-panel history-report-panel">
+      <div className="history-report-head">
+        <div>
+          <p className="eyebrow">Saved Full Report</p>
+          <h2>{result.finalReport.title}</h2>
+          <span>{formatDate(result.finalReport.generatedAt)}</span>
+        </div>
+        <a href={result.finalUrl || result.sourceUrl} rel="noreferrer" target="_blank">
+          <ExternalLink size={14} />
+          Open Source
+        </a>
+      </div>
+
+      <div className="history-info-grid">
+        <InfoCard label="Company" value={result.businessSummary.companyName} detail={result.businessSummary.category} />
+        <InfoCard label="Opportunity Score" value={`${result.salesOpportunityScore.score}/100`} detail={result.salesOpportunityScore.recommendedAngle} />
+        <InfoCard
+          label="Budget"
+          value={`${result.budgetEstimate.currency} ${formatNumber(result.budgetEstimate.min)}-${formatNumber(result.budgetEstimate.max)}`}
+          detail={`${result.budgetEstimate.roiPercent}% projected ROI`}
+        />
+        <InfoCard label="Confidence" value={`${result.analysisConfidence.score}%`} detail={result.analysisConfidence.level} />
+      </div>
+
+      <div className="history-report-grid">
+        <article>
+          <h3>Business Information</h3>
+          <dl className="history-report-dl">
+            <dt>Target Customer</dt>
+            <dd>{result.businessSummary.targetCustomer}</dd>
+            <dt>Value Proposition</dt>
+            <dd>{result.businessSummary.valueProposition}</dd>
+            <dt>Final URL</dt>
+            <dd>{result.finalUrl}</dd>
+          </dl>
+          {result.socialUrls.length ? (
+            <>
+              <h3>Social Sources</h3>
+              <ul className="source-list">
+                {result.socialUrls.map((socialUrl) => (
+                  <li key={socialUrl}>
+                    <a href={socialUrl} rel="noreferrer" target="_blank">
+                      <ExternalLink size={14} />
+                      {socialUrl}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </article>
+
+        <article>
+          <h3>Detected Problems</h3>
+          <ul className="dense-list">
+            {result.detectedProblems.map((problem) => (
+              <li key={problem.title}>
+                <strong>{problem.title}</strong>
+                {problem.description}
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        <article>
+          <h3>Proposal</h3>
+          <p>{result.proposalDraft.executiveSummary}</p>
+          <ul className="dense-list">
+            {result.proposalDraft.recommendedScope.map((scope) => (
+              <li key={scope}>{scope}</li>
+            ))}
+          </ul>
+        </article>
+
+        <article>
+          <h3>Next Steps</h3>
+          <ul className="dense-list">
+            {result.recommendedNextSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ul>
+        </article>
+      </div>
+
+      <div className="history-markdown-report">
+        <h3>Complete Report</h3>
+        <div>
+          {result.finalReport.sections.map((section, index) => (
+            <section key={`${section.heading}-${index}`}>
+              <h4>{section.heading}</h4>
+              <p>{section.content}</p>
+            </section>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InfoCard({ detail, label, value }: { detail: string; label: string; value: string }) {
+  return (
+    <div className="history-info-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{detail}</p>
+    </div>
   );
 }
 
@@ -232,4 +369,8 @@ function formatDate(value: string) {
 
 function signedNumber(value: number) {
   return value > 0 ? `+${value}` : `${value}`;
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("en", { maximumFractionDigits: 0 }).format(value);
 }

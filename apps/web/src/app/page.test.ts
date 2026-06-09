@@ -58,7 +58,9 @@ describe("HomePage loading button", () => {
     expect(source).toContain("social-presets");
     expect(source).toContain("parseSocialUrls(socialUrlsText)");
     expect(source).toContain('placeholder="https://example.com"');
-    expect(source).toContain("Paste a company website URL before running the agents.");
+    expect(source).toContain("Add a company website URL, at least one social media URL, or both.");
+    expect(source).toContain("You can also analyze social media only when a website is not available.");
+    expect(source).not.toContain("placeholder=\"https://example.com\"\n              required");
   });
 
   it("shows agent society, visual score, ROI, and memory panels", () => {
@@ -100,10 +102,13 @@ describe("HomePage loading button", () => {
     expect(source).toContain("Live Agent Chat");
     expect(source).toContain("Competitor");
     expect(source).toContain("Analysis History");
+    expect(source).toContain('href="/history"');
+    expect(source).not.toContain("HistoryStrip");
+    expect(source).not.toContain("history-strip");
+    expect(source).not.toContain('fetch("/api/history"');
     expect(source).toContain("/api/analyze/jobs");
     expect(source).toContain("pollAnalysisJob");
     expect(source).toContain("currentJob");
-    expect(source).toContain("Cloud DB");
     expect(source).toContain("Ask This Report");
     expect(source).toContain("/api/ask-report");
     expect(source).toContain("Search Provider");

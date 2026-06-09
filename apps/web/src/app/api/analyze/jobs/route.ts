@@ -1,25 +1,21 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { AnalyzeRequestSchema, normalizeAnalyzeUrl } from "../../../../lib/analyze-request";
 import { createAnalysisJob, markJobCompleted, markJobFailed, markJobRunning, updateJobAgent } from "../../../../lib/analysis-job-store";
 import { runLeadPilotAnalysis } from "../../../../lib/analysis-pipeline";
 import { createDefaultMemoryStore } from "../../../../lib/memory-store";
 import { createDefaultQwenProvider } from "../../../../lib/qwen-provider";
 import { createAnalyzeFetcher } from "../shared";
 
-const AnalyzeJobRequestSchema = z.object({
-  url: z.string().min(4).max(2048),
-  socialUrls: z.array(z.string().min(4).max(2048)).max(5).optional().default([])
-});
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const body = AnalyzeJobRequestSchema.parse(await request.json());
-    const job = createAnalysisJob({ url: body.url, socialUrls: body.socialUrls });
+    const body = AnalyzeRequestSchema.parse(await request.json());
+    const normalizedUrl = normalizeAnalyzeUrl(body.url, body.socialUrls);
+    const job = createAnalysisJob({ url: normalizedUrl, socialUrls: body.socialUrls });
 
-    void runJob(job.id, body.url, body.socialUrls);
+    void runJob(job.id, normalizedUrl, body.socialUrls);
 
     return NextResponse.json({ ok: true, job }, { status: 202 });
   } catch (error) {
